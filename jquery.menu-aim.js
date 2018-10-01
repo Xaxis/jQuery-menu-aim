@@ -65,6 +65,10 @@
  *          // Direction the submenu opens relative to the main menu. Can be
  *          // left, right, above, or below. Defaults to "right".
  *          submenuDirection: "right"
+ *
+ *          // The default number of ms to delay if a user appears to be entering
+ *          // a submenu. Defaults to 300 ms.
+ *          delay: 300
  *      });
  *
  * https://github.com/kamens/jQuery-menu-aim
@@ -91,6 +95,7 @@
                 submenuSelector: "*",
                 submenuDirection: "right",
                 tolerance: 75,  // bigger = more forgivey when entering submenu
+                delay: 300,  // ms delay when user appears to be entering submenu
                 enter: $.noop,
                 exit: $.noop,
                 activate: $.noop,
@@ -98,8 +103,7 @@
                 exitMenu: $.noop
             }, opts);
 
-        var MOUSE_LOCS_TRACKED = 3,  // number of past mouse locations to track
-            DELAY = 300;  // ms delay when user appears to be entering submenu
+        var MOUSE_LOCS_TRACKED = 3;  // number of past mouse locations to track;
 
         /**
          * Keep track of the last few locations of the mouse.
@@ -299,7 +303,7 @@
                     // currently activated submenu. Delay before activating a
                     // new menu row, because user may be moving into submenu.
                     lastDelayLoc = loc;
-                    return DELAY;
+                    return options.delay;
                 }
 
                 lastDelayLoc = null;

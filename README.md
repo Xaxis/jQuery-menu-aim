@@ -63,7 +63,11 @@ the relevant row's HTML element as the execution context ('this'):
          // controls which direction is "forgiving" as the user moves their
          // cursor from the main menu into the submenu. Can be one of "right",
          // "left", "above", or "below". Defaults to "right".
-         submenuDirection: "right"
+         submenuDirection: "right",
+         
+         // The default number of ms to delay if a user appears to be entering 
+         // a submenu. 
+         delay: 300
      });
 
 menu-aim assumes that you are using a menu with submenus that expand
