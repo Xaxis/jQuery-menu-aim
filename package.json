@@ -1,0 +1,22 @@
+{
+  "name": "jquery-menu-aim",
+  "version": "1.0.0",
+  "description": "NPM installable version of jquery-menu-aim.",
+  "main": "jquery.menu-aim.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xaxis/jQuery-menu-aim.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Xaxis/jQuery-menu-aim/issues"
+  },
+  "homepage": "https://github.com/Xaxis/jQuery-menu-aim#readme"
+}
