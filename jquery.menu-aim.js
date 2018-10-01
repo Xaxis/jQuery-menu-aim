@@ -356,6 +356,13 @@
                             'z-index': -9999
                         });
                     });
+
+                    // Account for hiding of the trajectory
+                    $menu.mouseleave(function(e) {
+                        $TRAJECTORY_CANVAS.css({
+                           display: 'none'
+                        });
+                    });
                 }
 
                 // Reference new canvas dimensions/positions
@@ -367,9 +374,10 @@
                 var canvas_dist_from_mouse = 5;
 
                 // Proceed while mouse is within menu
-                if (menu.pageX < (menu_offs.left + menu_w)) {
+                if (menu.pageX < (menu_offs.left + menu_w - canvas_dist_from_mouse)) {
 
                     // Set dimensions of canvas with mouse movement
+                    TRAJECTORY_CANVAS.style.display = "block";
                     TRAJECTORY_CANVAS.width = canvas_w - canvas_dist_from_mouse;
                     TRAJECTORY_CANVAS.height = canvas_h;
 
@@ -379,6 +387,10 @@
                         left: menu.pageX + canvas_dist_from_mouse,
                         'z-index': 9999
                     });
+
+                // Hide the canvas otherwise
+                } else {
+                    TRAJECTORY_CANVAS.style.display = "none";
                 }
 
                 // Clear the previous trajectory path
