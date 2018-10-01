@@ -96,6 +96,11 @@
                 submenuDirection: "right",
                 tolerance: 75,  // bigger = more forgivey when entering submenu
                 delay: 300,  // ms delay when user appears to be entering submenu
+                trajectory: false,
+                trajectoryLineColor: '#222222',
+                trajectoryLineWidth: '2',
+                trajectoryFillColor: '#FFCC00',
+                trajectoryOpacity: '0.5',
                 enter: $.noop,
                 exit: $.noop,
                 activate: $.noop,
@@ -103,7 +108,10 @@
                 exitMenu: $.noop
             }, opts);
 
-        var MOUSE_LOCS_TRACKED = 3;  // number of past mouse locations to track;
+        var MOUSE_LOCS_TRACKED = 3,  // number of past mouse locations to track;
+            TRAJECTORY_CANVAS = null,
+            $TRAJECTORY_CANVAS = null,
+            TRAJECTORY_CANVAS_CTX = null;
 
         /**
          * Keep track of the last few locations of the mouse.
@@ -311,9 +319,89 @@
             };
 
         /**
+         * Activate a menu row.
+         */
+        var drawTrajectory = function(menu) {
+
+            // Create canvas if not yet created
+            if (!TRAJECTORY_CANVAS) {
+                TRAJECTORY_CANVAS = document.createElement('canvas');
+                TRAJECTORY_CANVAS_CTX = TRAJECTORY_CANVAS.getContext("2d");
+
+                // Initialize canvas
+                TRAJECTORY_CANVAS.id = "jquery-menu-aim-trajectory-canvas";
+                TRAJECTORY_CANVAS.width = $menu.outerWidth();
+                TRAJECTORY_CANVAS.height = $menu.outerHeight();
+                TRAJECTORY_CANVAS.style.position = "absolute";
+                TRAJECTORY_CANVAS.style.opacity = options.trajectoryOpacity;
+
+                // Append canvas to body
+                $('body').append(TRAJECTORY_CANVAS);
+
+                // Quick reference to trajectory canvas
+                $TRAJECTORY_CANVAS = $('#jquery-menu-aim-trajectory-canvas');
+
+                // Initially position of canvas
+                $TRAJECTORY_CANVAS.css({
+                   top: $menu.offset().top,
+                   left: $menu.offset().left
+                });
+
+                // Move the canvas away if mouseenters it so that the menu still has context
+                $TRAJECTORY_CANVAS.mouseenter(function(e) {
+                    $(this).css({
+                        'z-index': -9999
+                    });
+                });
+            }
+
+            // Reference new canvas dimensions/positions
+            var menu_offs = $menu.offset();
+            var menu_w = $menu.outerWidth();
+            var menu_h = $menu.outerHeight();
+            var canvas_w = Math.abs((menu_offs.left + menu_w) - menu.pageX);
+            var canvas_h = menu_h;
+
+            // Proceed while mouse is within menu
+            if (menu.pageX < (menu_offs.left + menu_w)) {
+
+                // Set dimensions of canvas with mouse movement
+                TRAJECTORY_CANVAS.width = canvas_w;
+                TRAJECTORY_CANVAS.height = canvas_h;
+
+                // Reposition canvas with mouse movement making sure canvas isn't directly
+                // below the cursor.
+                $TRAJECTORY_CANVAS.css({
+                    left: menu.pageX + 5,
+                    'z-index': 9999
+                });
+            }
+
+            // Clear the previous trajectory path
+            TRAJECTORY_CANVAS_CTX.clearRect(0, 0, TRAJECTORY_CANVAS.width, TRAJECTORY_CANVAS.height);
+
+            // Trajectory path
+            TRAJECTORY_CANVAS_CTX.beginPath();
+            TRAJECTORY_CANVAS_CTX.moveTo(options.trajectoryLineWidth, menu.pageY - menu_offs.top);
+            TRAJECTORY_CANVAS_CTX.lineTo(TRAJECTORY_CANVAS.width, 0);
+            TRAJECTORY_CANVAS_CTX.lineTo(TRAJECTORY_CANVAS.width, TRAJECTORY_CANVAS.height);
+            TRAJECTORY_CANVAS_CTX.closePath();
+
+            // Draw the path outline
+            TRAJECTORY_CANVAS_CTX.lineWidth = options.trajectoryLineWidth;
+            TRAJECTORY_CANVAS_CTX.strokeStyle = options.trajectoryLineColor;
+            TRAJECTORY_CANVAS_CTX.stroke();
+
+            // Fill the trajectory triangle
+            TRAJECTORY_CANVAS_CTX.fillStyle = options.trajectoryFillColor;
+            TRAJECTORY_CANVAS_CTX.fill();
+        };
+
+        /**
          * Hook up initial menu events
          */
         $menu
+            .mousemove(drawTrajectory)
             .mouseleave(mouseleaveMenu)
             .find(options.rowSelector)
                 .mouseenter(mouseenterRow)
